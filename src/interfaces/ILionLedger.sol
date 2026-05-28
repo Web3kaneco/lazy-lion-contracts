@@ -8,7 +8,7 @@ pragma solidity ^0.8.24;
 ///         external indexer.
 interface ILionLedger {
     /// @notice Canonical event categories. New categories can be added
-    ///         by the operator without storage changes — they just emit
+    ///         by the operator without storage changes. they just emit
     ///         under EventType.Custom with a category string.
     enum EventType {
         PickMade,
@@ -30,9 +30,9 @@ interface ILionLedger {
     /// @param tokenId The Lion's mainnet token id
     /// @param eventType Category enum
     /// @param submitter The wallet that submitted (operator or holder)
-    /// @param payload Free-form bytes — typically a Merkle root or hash
+    /// @param payload Free-form bytes. typically a Merkle root or hash
     ///                of the off-chain artifact this event commemorates
-    /// @param metadata Free-form bytes — optional inline data (small)
+    /// @param metadata Free-form bytes. optional inline data (small)
     event LionEvent(
         address indexed mainnetCollection,
         uint256 indexed tokenId,

@@ -13,7 +13,7 @@ import {ILionLedger} from "./interfaces/ILionLedger.sol";
 ///      The LazyLionAgents backend wallet is the v0 operator; it has
 ///      already verified the caller's mainnet ownership of the Lion
 ///      before submitting. Adding holder-direct writes with signature
-///      verification is a future extension — not needed for v0.
+///      verification is a future extension. not needed for v0.
 ///
 ///      Operators are TRUSTED. They can spam events (and thus inflate
 ///      earned-level scores) for any Lion. Mitigations:

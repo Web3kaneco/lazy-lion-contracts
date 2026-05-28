@@ -14,7 +14,7 @@ swarm engine, and the MCP server.
    │    └── per-Lion metadata: name, tagline,   │
    │        target bitmap, reveal seq, level    │
    │        ▲                                   │
-   │        │ evolve() — holder pays gas        │
+   │        │ evolve(). holder pays gas        │
    │        │ to crystallize earned levels      │
    └────────┼───────────────────────────────────┘
             │
@@ -33,8 +33,8 @@ swarm engine, and the MCP server.
 ```
 
 The Lion lives on Ethereum mainnet. Its **ledger** lives on Base, where
-every action — picks, journals, swarm verdicts, art mints, subscription
-events — costs cents to record. When a holder wants to crystallize an
+every action. picks, journals, swarm verdicts, art mints, subscription
+events. costs cents to record. When a holder wants to crystallize an
 achievement onto the Lion itself, they pull a signed proof from the
 Base `LionEvolutionOracle` and pay mainnet gas to commit it via
 adapter8004's `setMetadata`.

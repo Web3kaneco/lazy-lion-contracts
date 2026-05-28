@@ -14,11 +14,11 @@ import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 ///
 /// Env vars expected:
 ///   DEPLOYER_PRIVATE_KEY
-///   OPERATOR_ADDRESS         — LazyLionAgents backend wallet
-///   ORACLE_SIGNER_ADDRESS    — wallet whose sig adapter8004 trusts
-///   PLATFORM_RECIPIENT       — platform fee recipient (5%)
-///   TREASURY_RECIPIENT       — treasury fee recipient (5%)
-///   USDC_ADDRESS             — Base USDC (0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913)
+///   OPERATOR_ADDRESS        . LazyLionAgents backend wallet
+///   ORACLE_SIGNER_ADDRESS   . wallet whose sig adapter8004 trusts
+///   PLATFORM_RECIPIENT      . platform fee recipient (5%)
+///   TREASURY_RECIPIENT      . treasury fee recipient (5%)
+///   USDC_ADDRESS            . Base USDC (0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913)
 contract Deploy is Script {
     address constant USDC_BASE = 0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913;
 

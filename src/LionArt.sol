@@ -18,7 +18,7 @@ import {ILionLedger} from "./interfaces/ILionLedger.sol";
 /// @dev Mint authorization: the holder of the mainnet Lion signs an
 ///      EIP-712 mint intent which this contract verifies. The signer's
 ///      mainnet ownership is verified off-chain by the LazyLionAgents
-///      backend (which then submits the mint tx) — a future version
+///      backend (which then submits the mint tx). a future version
 ///      can plug in a Base→mainnet ownership oracle for fully
 ///      trustless verification.
 ///
@@ -74,7 +74,7 @@ contract LionArt is ERC721, Ownable, EIP712 {
 
     // --- EIP-712 -----------------------------------------------------
 
-    /// @dev v2 typehash — adds `renderer` so a holder's signed intent
+    /// @dev v2 typehash. adds `renderer` so a holder's signed intent
     ///      is bound to the renderer version that was current when they
     ///      signed. Prevents intents from being applied under a future
     ///      renderer the holder didn't see.
@@ -236,7 +236,7 @@ contract LionArt is ERC721, Ownable, EIP712 {
 
         _safeMint(holder, tokenId);
 
-        // Best-effort ledger event — don't revert the mint if ledger
+        // Best-effort ledger event. don't revert the mint if ledger
         // is misconfigured. LOW-7: emit a tracked event so monitoring
         // can alert on drift between mints and counters.
         if (address(ledger) != address(0)) {

@@ -14,7 +14,7 @@ contract LionRendererTest is Test {
 
     function _inputs() internal pure returns (ILionRenderer.RenderInputs memory) {
         bytes memory bitmap = new bytes(200);
-        // sparse bitmap — just a few pixels set so the SVG isn't gigantic
+        // sparse bitmap. just a few pixels set so the SVG isn't gigantic
         bitmap[0] = 0xFF;
         bitmap[10] = 0xAA;
         bitmap[100] = 0x55;
@@ -55,7 +55,7 @@ contract LionRendererTest is Test {
         string memory svg = renderer.renderSVG(inp);
         // Verify the raw chars don't appear as text in the SVG body
         bytes memory b = bytes(svg);
-        // Search for unescaped "<bad>" — should not be present
+        // Search for unescaped "<bad>". should not be present
         bool foundBad = false;
         for (uint256 i = 0; i + 4 < b.length; i++) {
             if (b[i] == "<" && b[i+1] == "b" && b[i+2] == "a" && b[i+3] == "d" && b[i+4] == ">") {

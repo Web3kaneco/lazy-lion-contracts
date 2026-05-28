@@ -7,11 +7,11 @@ pragma solidity ^0.8.24;
 ///
 /// Given a Lion's base bitmap, current level, and a snapshot of
 /// activity-derived inputs, returns the full SVG bytes for a layered
-/// generative art piece. The art is genuinely on chain — the renderer
+/// generative art piece. The art is genuinely on chain. the renderer
 /// has no external dependencies, no IPFS, no off-chain calls.
 interface ILionRenderer {
     /// @notice Inputs needed to render one piece. All fields are
-    ///         deterministic — same inputs always produce identical
+    ///         deterministic. same inputs always produce identical
     ///         output bytes.
     struct RenderInputs {
         /// Lion bitmap at the time of mint (25 bytes packed)

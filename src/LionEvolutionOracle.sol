@@ -53,7 +53,7 @@ contract LionEvolutionOracle is ILionEvolutionOracle, Ownable, EIP712 {
 
     // --- EIP-712 typehash --------------------------------------------
 
-    /// @dev v2 typehash — adds `nonce` so the same (collection, token,
+    /// @dev v2 typehash. adds `nonce` so the same (collection, token,
     ///      holder, level, validUntil) tuple produces a unique digest
     ///      per proof, preventing mainnet replay of identical proofs.
     bytes32 private constant EVOLUTION_PROOF_TYPEHASH = keccak256(

@@ -5,12 +5,12 @@
 The Lazy Lion contract system has two trusted keys that must be
 protected like crown jewels:
 
-1. **Oracle signer** — the wallet whose ECDSA signature mainnet
+1. **Oracle signer**. the wallet whose ECDSA signature mainnet
    adapter8004 trusts when a holder evolves their Lion. Compromise
    means an attacker can sign fake "earned level 100" proofs for any
    Lion and the mainnet adapter accepts them.
 
-2. **Operator** — the wallet that submits ledger writes and mints art
+2. **Operator**. the wallet that submits ledger writes and mints art
    on behalf of authenticated holders. Compromise means an attacker
    can spam ledger events (inflating earned-level scores for any Lion)
    and submit mint transactions for any holder-signed intent they can
@@ -18,16 +18,16 @@ protected like crown jewels:
    *different* art than the holder authorized, but they can submit
    stale/old intents.
 
-Owner key — controls timelock-protected operations. Important but
+Owner key. controls timelock-protected operations. Important but
 slower to exploit because of the 24h delay.
 
 ## v0 key custody
 
 Both keys live in env vars on the LazyLionAgents backend host:
 
-- `LION_OPERATOR_PRIVATE_KEY` — used by `lib/lion-ledger-client.ts` to
+- `LION_OPERATOR_PRIVATE_KEY`. used by `lib/lion-ledger-client.ts` to
   sign ledger writes
-- Oracle signer key — used by the off-chain oracle service (NOT in
+- Oracle signer key. used by the off-chain oracle service (NOT in
   this repo yet; see "Oracle service" below)
 
 **This is acceptable for testnet and early mainnet beta but is not
@@ -37,13 +37,13 @@ production-grade.** A VPS compromise hands the attacker both keys.
 
 Migrate both keys to a Key Management Service. Two reasonable options:
 
-### Option A — AWS KMS
+### Option A. AWS KMS
 
 Keys live in KMS. Application code calls `Sign` API to get a signature
 over a digest. Private key bytes never leave the HSM.
 
 ```ts
-// Sketch — replaces operatorWallet() in lib/lion-ledger-client.ts
+// Sketch. replaces operatorWallet() in lib/lion-ledger-client.ts
 import { KMSClient, SignCommand } from "@aws-sdk/client-kms";
 
 async function kmsSign(digest: Buffer): Promise<Hex> {
@@ -61,7 +61,7 @@ async function kmsSign(digest: Buffer): Promise<Hex> {
 The viem `walletClient` lets you swap in a custom signer via
 `createWalletClient({ account: toAccount({ ... sign: kmsSign }) })`.
 
-### Option B — Turnkey
+### Option B. Turnkey
 
 Purpose-built for Web3 key custody. Simpler API, runs in TEEs, no
 ECDSA recovery byte gymnastics.

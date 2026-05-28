@@ -35,14 +35,14 @@ contract LionRenderer is ILionRenderer {
 
     // Event kind labels (short, for the frame)
     string[8] internal EVENT_LABELS = [
-        "ANCHOR", // 0 — generic anchor mint
-        "EVOLVE", // 1 — level milestone
-        "VERDICT", // 2 — swarm verdict
-        "SUB", // 3 — subscription anniversary
-        "STREAK", // 4 — pick streak
-        "TOOL", // 5 — tool authorization
-        "LORE", // 6 — lore update
-        "CUSTOM" // 7 — anything else
+        "ANCHOR", // 0. generic anchor mint
+        "EVOLVE", // 1. level milestone
+        "VERDICT", // 2. swarm verdict
+        "SUB", // 3. subscription anniversary
+        "STREAK", // 4. pick streak
+        "TOOL", // 5. tool authorization
+        "LORE", // 6. lore update
+        "CUSTOM" // 7. anything else
     ];
 
     /// @inheritdoc ILionRenderer

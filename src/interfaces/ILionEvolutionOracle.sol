@@ -6,13 +6,13 @@ pragma solidity ^0.8.24;
 ///         level that holders submit to adapter8004 on mainnet.
 interface ILionEvolutionOracle {
     /// @notice Compute the earned level for a Lion from its current
-    ///         ledger counters. Pure view function — no signature.
+    ///         ledger counters. Pure view function. no signature.
     function earnedLevel(address mainnetCollection, uint256 tokenId)
         external
         view
         returns (uint8);
 
-    /// @notice Return the shape of an evolution proof — what the
+    /// @notice Return the shape of an evolution proof. what the
     ///         off-chain oracle service needs to produce a signature
     ///         for. The actual ECDSA signature is NOT returned here
     ///         (the private key is held off-chain). Callers use this
