@@ -16,12 +16,15 @@ jobs:
         uses: foundry-rs/foundry-toolchain@v1
         with:
           version: stable
-      # No submodules are committed, so install both deps the remappings
-      # reference (forge-std + openzeppelin-contracts) before building.
+      # Install the two deps the remappings reference. No --no-commit:
+      # newer Foundry removed that flag, older Foundry commits the submodule
+      # and needs a git identity. Setting an identity works on both.
       - name: Install dependencies
         run: |
-          forge install foundry-rs/forge-std --no-commit
-          forge install OpenZeppelin/openzeppelin-contracts --no-commit
+          git config user.email "ci@lazylions.local"
+          git config user.name "CI"
+          forge install foundry-rs/forge-std
+          forge install OpenZeppelin/openzeppelin-contracts
       - name: Build
         run: forge build --sizes
       - name: Test
