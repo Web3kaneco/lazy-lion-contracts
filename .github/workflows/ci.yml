@@ -12,14 +12,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-        with:
-          submodules: recursive
       - name: Install Foundry
         uses: foundry-rs/foundry-toolchain@v1
         with:
           version: stable
-      - name: Install OpenZeppelin
-        run: forge install OpenZeppelin/openzeppelin-contracts --no-commit || true
+      # No submodules are committed, so install both deps the remappings
+      # reference (forge-std + openzeppelin-contracts) before building.
+      - name: Install dependencies
+        run: |
+          forge install foundry-rs/forge-std --no-commit
+          forge install OpenZeppelin/openzeppelin-contracts --no-commit
       - name: Build
         run: forge build --sizes
       - name: Test
