@@ -1,0 +1,26 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [master]
+  push:
+    branches: [master]
+
+jobs:
+  forge:
+    name: Forge build + test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - name: Install Foundry
+        uses: foundry-rs/foundry-toolchain@v1
+        with:
+          version: stable
+      - name: Install OpenZeppelin
+        run: forge install OpenZeppelin/openzeppelin-contracts --no-commit || true
+      - name: Build
+        run: forge build --sizes
+      - name: Test
+        run: forge test -vvv
