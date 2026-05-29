@@ -33,17 +33,19 @@ contract LionRenderer is ILionRenderer {
 
     error InvalidBitmapLength(uint256 got, uint256 expected);
 
-    // Event kind labels (short, for the frame)
-    string[8] internal EVENT_LABELS = [
-        "ANCHOR", // 0. generic anchor mint
-        "EVOLVE", // 1. level milestone
-        "VERDICT", // 2. swarm verdict
-        "SUB", // 3. subscription anniversary
-        "STREAK", // 4. pick streak
-        "TOOL", // 5. tool authorization
-        "LORE", // 6. lore update
-        "CUSTOM" // 7. anything else
-    ];
+    /// @dev Event kind labels (short, for the frame). A pure function
+    ///      rather than a storage array so the render path stays `pure`
+    ///      (Solidity has no constant string[] type).
+    function _eventLabel(uint256 ev) internal pure returns (string memory) {
+        if (ev == 0) return "ANCHOR"; // generic anchor mint
+        if (ev == 1) return "EVOLVE"; // level milestone
+        if (ev == 2) return "VERDICT"; // swarm verdict
+        if (ev == 3) return "SUB"; // subscription anniversary
+        if (ev == 4) return "STREAK"; // pick streak
+        if (ev == 5) return "TOOL"; // tool authorization
+        if (ev == 6) return "LORE"; // lore update
+        return "CUSTOM"; // 7+ anything else
+    }
 
     /// @inheritdoc ILionRenderer
     function renderSVG(RenderInputs calldata inputs)
@@ -188,7 +190,7 @@ contract LionRenderer is ILionRenderer {
         returns (string memory)
     {
         uint256 ev = inputs.eventKind < 8 ? inputs.eventKind : 7;
-        string memory label = EVENT_LABELS[ev];
+        string memory label = _eventLabel(ev);
         string memory border = string.concat(
             '<rect x="4" y="4" width="472" height="472" fill="none" stroke="',
             accent,
