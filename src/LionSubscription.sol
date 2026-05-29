@@ -113,6 +113,7 @@ contract LionSubscription is ERC721, Ownable, ReentrancyGuard {
     error NotOperator();
     error CostExceedsMax(uint256 actual, uint256 max);
     error InvalidRecipient();
+    error NotTransferable();
 
     // --- Construction ------------------------------------------------
 
@@ -152,7 +153,12 @@ contract LionSubscription is ERC721, Ownable, ReentrancyGuard {
     /// @notice Update the payee for a tier. Called when ownership of
     ///         the mainnet Lion transfers. Operator-only; the operator
     ///         verifies the new holder before submitting.
-    /// @dev MED-6 fix: stale payouts after Lion sale.
+    /// @dev MED-6 fix: stale payouts after Lion sale. This rotation is
+    ///      intentionally instant (no timelock) because it must follow
+    ///      a mainnet Lion sale immediately. a delay would route the new
+    ///      owner's subscription revenue to the previous holder for the
+    ///      duration of the timelock. The operator is trusted to verify
+    ///      ownership before calling, same trust assumption as registerTier.
     function updateHolderPayee(
         address mainnetCollection,
         uint256 tokenId,
@@ -363,6 +369,7 @@ contract LionSubscription is ERC721, Ownable, ReentrancyGuard {
 
     /// @notice Owner-only recovery for funds deferred to address(0).
     function sweepZeroAddress(address to) external onlyOwner {
+        if (to == address(0)) revert InvalidRecipient();
         uint256 amount = unclaimed[address(this)];
         unclaimed[address(this)] = 0;
         if (amount > 0) paymentToken.safeTransfer(to, amount);
@@ -378,7 +385,7 @@ contract LionSubscription is ERC721, Ownable, ReentrancyGuard {
         if (from != address(0) && to != address(0)) {
             Subscription memory s = subs[tokenId];
             Tier memory t = tiers[s.mainnetCollection][s.mainnetTokenId];
-            require(t.transferable, "LionSubscription: non-transferable");
+            if (!t.transferable) revert NotTransferable();
         }
     }
 }

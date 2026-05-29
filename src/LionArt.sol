@@ -45,9 +45,6 @@ contract LionArt is ERC721, Ownable, EIP712 {
     /// @dev tokenId → Piece
     mapping(uint256 => Piece) public pieces;
 
-    /// @dev mint intents already consumed (anti-replay)
-    mapping(bytes32 => bool) public consumedIntents;
-
     /// @notice Renderer for tokenURI. Owner can swap in a v2 renderer
     ///         later without redeploying this contract.
     ILionRenderer public renderer;
@@ -68,6 +65,9 @@ contract LionArt is ERC721, Ownable, EIP712 {
 
     /// @notice Per-holder nonce tracking. Each mint must use a unique
     ///         nonce per holder. MED-5: enforces strict uniqueness.
+    ///         This is the sole anti-replay guard. the signed digest
+    ///         includes the nonce, so a unique (holder, nonce) pair
+    ///         uniquely identifies every intent.
     mapping(address => mapping(uint256 => bool)) public usedNonces;
 
     uint256 private _nextTokenId;
@@ -105,7 +105,6 @@ contract LionArt is ERC721, Ownable, EIP712 {
 
     error InvalidSignature();
     error IntentExpired();
-    error IntentAlreadyUsed();
     error NotOperator();
     error InvalidBitmapLength();
     error NonceAlreadyUsed();
@@ -214,11 +213,9 @@ contract LionArt is ERC721, Ownable, EIP712 {
             )
         );
         bytes32 digest = _hashTypedDataV4(intentStruct);
-        if (consumedIntents[digest]) revert IntentAlreadyUsed();
         address recovered = ECDSA.recover(digest, holderSignature);
         if (recovered != holder || recovered == address(0)) revert InvalidSignature();
 
-        consumedIntents[digest] = true;
         usedNonces[holder][nonce] = true;
 
         tokenId = _nextTokenId++;
@@ -282,7 +279,7 @@ contract LionArt is ERC721, Ownable, EIP712 {
 
         string memory json = string.concat(
             '{"name":"',
-            p.name,
+            _escapeJSON(p.name),
             unicode" \xe2\x80\x94 Lion #",
             p.mainnetTokenId.toString(),
             '","description":"',
@@ -306,6 +303,28 @@ contract LionArt is ERC721, Ownable, EIP712 {
             "data:application/json;base64,",
             Base64.encode(bytes(json))
         );
+    }
+
+    /// @dev Minimal JSON string escaper for values interpolated into the
+    ///      tokenURI metadata. The renderer escapes for SVG/XML; this
+    ///      escapes for the surrounding JSON. Without it a name with a
+    ///      double-quote or backslash produces invalid JSON.
+    function _escapeJSON(string memory s) internal pure returns (string memory) {
+        bytes memory b = bytes(s);
+        bytes memory out;
+        for (uint256 i = 0; i < b.length; i++) {
+            bytes1 c = b[i];
+            if (c == "\\") out = abi.encodePacked(out, "\\\\");
+            else if (c == '"') out = abi.encodePacked(out, "\\\"");
+            else if (c == 0x08) out = abi.encodePacked(out, "\\b");
+            else if (c == 0x09) out = abi.encodePacked(out, "\\t");
+            else if (c == 0x0A) out = abi.encodePacked(out, "\\n");
+            else if (c == 0x0C) out = abi.encodePacked(out, "\\f");
+            else if (c == 0x0D) out = abi.encodePacked(out, "\\r");
+            else if (uint8(c) < 0x20) continue; // drop other control chars
+            else out = abi.encodePacked(out, c);
+        }
+        return string(out);
     }
 
     /// @notice EIP-712 digest helper for the LazyLionAgents site to

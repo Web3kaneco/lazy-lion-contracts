@@ -105,6 +105,7 @@ contract LionEvolutionOracle is ILionEvolutionOracle, Ownable, EIP712 {
     // --- Errors ------------------------------------------------------
 
     error EmptyThresholds();
+    error ThresholdsNotMonotonic(uint256 index);
     error NoProposal();
     error ProposalNotReady(uint64 readyAt);
     error TimelockOutOfRange(uint64 requested);
@@ -123,6 +124,8 @@ contract LionEvolutionOracle is ILionEvolutionOracle, Ownable, EIP712 {
 
         // Default thresholds: roughly the activity profile a casual
         // holder would hit organically. Tunable post-deploy.
+        // Must stay strictly increasing. earnedLevel() breaks on the
+        // first miss, so an unsorted list would silently cap levels.
         levelThresholds = [
             0, // level 0 (everyone)
             10, // level 1
@@ -136,6 +139,7 @@ contract LionEvolutionOracle is ILionEvolutionOracle, Ownable, EIP712 {
             5500, // level 9
             8500 // level 10
         ];
+        _requireMonotonic(levelThresholds);
 
         weights = Weights({
             pickMade: 1,
@@ -153,7 +157,10 @@ contract LionEvolutionOracle is ILionEvolutionOracle, Ownable, EIP712 {
         emit ProofValidityUpdated(proofValiditySeconds);
     }
 
-    // --- Owner controls (timelock-gated) -----------------------------
+    // --- Owner controls (instant) ------------------------------------
+    // These two are low-risk and apply immediately. The sensitive
+    // rotations (signer, weights, thresholds) are timelocked via the
+    // propose/cancel/apply sections below.
 
     function setProofValidity(uint64 seconds_) external onlyOwner {
         proofValiditySeconds = seconds_;
@@ -219,6 +226,7 @@ contract LionEvolutionOracle is ILionEvolutionOracle, Ownable, EIP712 {
 
     function proposeThresholds(uint32[] calldata candidate) external onlyOwner {
         if (candidate.length == 0) revert EmptyThresholds();
+        _requireMonotonic(candidate);
         _pendingThresholds.candidate = candidate;
         _pendingThresholds.readyAt = uint64(block.timestamp) + timelockDelay;
         _pendingThresholds.exists = true;
@@ -242,6 +250,15 @@ contract LionEvolutionOracle is ILionEvolutionOracle, Ownable, EIP712 {
 
     function pendingThresholds() external view returns (uint32[] memory, uint64, bool) {
         return (_pendingThresholds.candidate, _pendingThresholds.readyAt, _pendingThresholds.exists);
+    }
+
+    /// @dev Thresholds must be strictly increasing because earnedLevel()
+    ///      stops at the first threshold the score doesn't meet. An
+    ///      unsorted list would silently cap a Lion below its true level.
+    function _requireMonotonic(uint32[] memory t) private pure {
+        for (uint256 i = 1; i < t.length; i++) {
+            if (t[i] <= t[i - 1]) revert ThresholdsNotMonotonic(i);
+        }
     }
 
     // --- Score + level computation -----------------------------------
