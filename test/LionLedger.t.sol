@@ -8,7 +8,7 @@ import {ILionLedger} from "../src/interfaces/ILionLedger.sol";
 contract LionLedgerTest is Test {
     LionLedger ledger;
     address owner = address(0xA11CE);
-    address operator = address(0x0PE2A);
+    address operator = address(0x09E2A);
     address rando = address(0xBADBAD);
 
     address constant LAZY_LIONS = 0x8943C7bAC1914C9A7ABa750Bf2B6B09Fd21037E0;

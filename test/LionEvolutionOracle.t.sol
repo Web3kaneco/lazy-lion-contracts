@@ -11,7 +11,7 @@ contract LionEvolutionOracleTest is Test {
     LionEvolutionOracle oracle;
 
     address owner = address(0xA11CE);
-    address operator = address(0x0PE2A);
+    address operator = address(0x09E2A);
     uint256 signerKey = 0xBEEF;
     address signer;
 
