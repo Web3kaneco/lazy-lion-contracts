@@ -34,11 +34,22 @@ groups never become syndicates.
    token. (See "Payout address resolution" for how a Base contract learns
    a mainnet holder.)
 
-3. **On-chain consent to join.** Because joining commits someone's asset to
-   a revenue arrangement, each member's holder must accept on chain. A
-   leader proposes a member; that member's holder calls `acceptMembership`.
-   No Lion is ever in a syndicate without its holder's signed consent. A
-   member's holder can `leaveSyndicate` at any time.
+3. **Signature-verified consent to join.** Because joining commits
+   someone's asset to a revenue arrangement, consent is an EIP-712
+   signature the contract itself recovers and checks. never operator
+   attestation, never an unauthorized add. A leader proposes a member; the
+   member is inert until a valid consent signature is submitted. A member's
+   holder can `leaveSyndicate` at any time.
+
+   CRITICAL DESIGN POINT for the future: the contract recovers the signer
+   and checks it is authorized for that member Lion, but it does NOT assume
+   the signer is a human. In v1 the holder (a human wallet) signs. The day
+   agents safely hold their own keys (the deferred custody capability), an
+   AGENT can sign its own consent with ZERO contract change, because the
+   verifier only cares that the recovered signer is authorized, not whether
+   it is a person. This is what makes the autonomous agent-to-agent
+   syndicate (v2) a drop-in rather than a rewrite. Build the signature
+   path now precisely so that future is not blocked.
 
 4. **Equal split across members in v1.** Revenue, after platform+treasury,
    splits equally across the active member Lions, matching
@@ -132,14 +143,26 @@ the fixed 3-way split.
 ## Consent integrity (the security core)
 
 - `proposeMember` only records an intent; it grants nothing. The member is
-  inactive until accepted.
-- `acceptMembership` must be called by the CURRENT holder of that member
-  Lion. Since this is on Base and ownership is on mainnet, acceptance is
-  authorized by the operator attesting holder == caller, OR (cleaner) the
-  member supplies a signature the contract can check. v1: operator-attested
-  acceptance, consistent with how onboarding already verifies mainnet
-  ownership off-chain before submitting. Document this trust assumption
-  loudly; it is the same one the rest of the system already makes.
+  inactive until a valid consent signature is accepted.
+- Consent is EIP-712. The signed struct binds the syndicate, the member
+  Lion (collection, tokenId), the payout address, and a nonce, so a
+  signature authorizes exactly one membership and cannot be replayed or
+  retargeted. The contract recovers the signer and checks it against the
+  authorized signer for that Lion.
+- AUTHORIZED SIGNER. who is allowed to consent for a member Lion. In v1
+  this is the holder's wallet. Because a Base contract cannot read mainnet
+  `ownerOf`, the authorized signer is established the same way the rest of
+  the system handles cross-chain ownership: the consenting holder's address
+  is provided and the operator attests it currently holds the Lion at
+  consent time (the same trust assumption as onboarding and
+  updateHolderPayee). The SIGNATURE is trustless; the operator's only role
+  is attesting the signer holds the mainnet Lion, not authorizing the join
+  itself. This cleanly separates "who may sign" (needs the mainnet
+  ownership fact) from "did they sign" (pure on-chain recovery).
+- FUTURE (v2, agent-signed): when agents hold their own keys, the agent's
+  key becomes the authorized signer for its own Lion and signs its own
+  consent. No contract change. the recovery logic is identical. Deferred
+  only because agent key custody is deferred.
 - A buyer cannot subscribe to a syndicate with zero active members (no one
   to pay; revert).
 - Leaving sets the member inactive and re-divides future revenue among the
