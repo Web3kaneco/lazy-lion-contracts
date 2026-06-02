@@ -60,7 +60,7 @@ interface ILionLedger {
     }
 
     /// @notice Read the current counters for a Lion. Called by the
-    ///         EvolutionOracle and the LionArt mint flow.
+    ///         EvolutionOracle and the agent art renderer.
     function counters(address mainnetCollection, uint256 tokenId)
         external
         view
