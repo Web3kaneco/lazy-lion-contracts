@@ -16,8 +16,8 @@ import {ILionRenderer} from "./interfaces/ILionRenderer.sol";
 ///
 /// Designed to be replaced or extended later. Other contracts depend
 /// only on the interface, not on the algorithm details. A future
-/// LionRenderer v2 can ship as a separate deployment and the LionArt
-/// admin can switch over via setRenderer().
+/// LionRenderer v2 can ship as a separate deployment and the metadata
+/// pointer can switch over to it.
 contract LionRenderer is ILionRenderer {
     using Strings for uint256;
 

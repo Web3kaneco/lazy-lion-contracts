@@ -5,7 +5,6 @@ import "forge-std/Script.sol";
 import {LionLedger} from "../src/LionLedger.sol";
 import {LionEvolutionOracle} from "../src/LionEvolutionOracle.sol";
 import {LionRenderer} from "../src/LionRenderer.sol";
-import {LionArt} from "../src/LionArt.sol";
 import {LionSubscription} from "../src/LionSubscription.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
@@ -44,9 +43,6 @@ contract Deploy is Script {
         LionRenderer renderer = new LionRenderer();
         console2.log("LionRenderer:", address(renderer));
 
-        LionArt art = new LionArt(deployer, renderer, ledger, operator);
-        console2.log("LionArt:", address(art));
-
         LionSubscription subs = new LionSubscription(
             deployer,
             IERC20(usdc),
@@ -57,8 +53,7 @@ contract Deploy is Script {
         );
         console2.log("LionSubscription:", address(subs));
 
-        // Authorize LionArt + LionSubscription to write to the ledger
-        ledger.setOperator(address(art), true);
+        // Authorize LionSubscription to write to the ledger
         ledger.setOperator(address(subs), true);
 
         vm.stopBroadcast();
